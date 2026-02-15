@@ -1,8 +1,5 @@
 pipeline {
     agent { label 'self-hosted && linux' }
-    environment {
-        // Set any global environment variables here if needed
-    }
     stages {
         stage('Clippy') {
             parallel {
