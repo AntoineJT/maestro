@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'self-hosted && linux' }
+    agent any
     stages {
         stage('Clippy') {
             parallel {
