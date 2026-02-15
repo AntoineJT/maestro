@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'maestro' }
     stages {
         stage('Clippy') {
             parallel {
