@@ -2,13 +2,15 @@ pipeline {
     agent { label 'maestro' }
     stages {
         // TODO add cache
-        stage('Install rust toolchain') {
+        stage('Install rust toolchains') {
             steps {
+                // used for builds with 'cargo install'
+                sh 'rustup toolchain install stable'
                 // install from rust-toolchain.toml
                 sh 'rustup show'
             }
         }
-        stage('Clippy/Format') {
+        stage('Lint') {
             matrix {
                 axes {
                     axis {
