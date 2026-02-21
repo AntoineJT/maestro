@@ -8,68 +8,21 @@ pipeline {
                 sh 'rustup show'
             }
         }
-        // TODO use matrixes
-        stage('Clippy') {
-            parallel {
-                stage('Macros') {
-                    steps {
-                        dir('macros') {
-                            sh 'cargo clippy --all-features --all-targets -- -D warnings'
-                        }
+        stage('Clippy/Format') {
+            matrix {
+                axes {
+                    axis {
+                        name 'DIR'
+                        values 'macros', 'utils', 'kernel', 'inttest'
                     }
                 }
-                stage('Utils') {
-                    steps {
-                        dir('utils') {
-                            sh 'cargo clippy --all-features --all-targets -- -D warnings'
-                        }
-                    }
-                }
-                stage('Kernel') {
-                    steps {
-                        dir('kernel') {
-                            sh 'cp default.build-config.toml build-config.toml' // TODO rm
-                            sh 'cargo clippy --all-features --all-targets -- -D warnings'
-                        }
-                    }
-                }
-                stage('Integration tests') {
-                    steps {
-                        dir('inttest') {
-                            sh 'cargo clippy --all-features --all-targets -- -D warnings'
-                        }
-                    }
-                }
-            }
-        }
-        // TODO use matrixes
-        stage('Format') {
-            parallel {
-                stage('Macros') {
-                    steps {
-                        dir('macros') {
-                            sh 'cargo fmt --check'
-                        }
-                    }
-                }
-                stage('Utils') {
-                    steps {
-                        dir('utils') {
-                            sh 'cargo fmt --check'
-                        }
-                    }
-                }
-                stage('Kernel') {
-                    steps {
-                        dir('kernel') {
-                            sh 'cargo fmt --check'
-                        }
-                    }
-                }
-                stage('Integration tests') {
-                    steps {
-                        dir('inttest') {
-                            sh 'cargo fmt --check'
+                stages {
+                    stage('$DIR') {
+                        steps {
+                            dir('$DIR') {
+                                sh 'cargo clippy --all-features --all-targets -- -D warnings'
+                                sh 'cargo fmt --check'
+                            }
                         }
                     }
                 }
