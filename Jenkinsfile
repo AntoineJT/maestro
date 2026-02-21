@@ -1,13 +1,13 @@
 pipeline {
     agent { label 'maestro' }
     stages {
-        stage('Clippy') {
-            stage('Install rust toolchain') {
-                steps {
-                    // install from rust-toolchain.toml
-                    sh 'rustup show'
-                }
+        stage('Install rust toolchain') {
+            steps {
+                // install from rust-toolchain.toml
+                sh 'rustup show'
             }
+        }
+        stage('Clippy') {
             parallel {
                 stage('Macros') {
                     steps {
