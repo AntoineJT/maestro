@@ -78,7 +78,7 @@ pipeline {
         stage('Book') {
             steps {
                 // TODO add cache
-                sh 'cargo install mdbook mdbook-mermaid'
+                sh 'cargo +stable install mdbook mdbook-mermaid'
                 sh 'mdbook-mermaid install doc/'
                 sh 'mdbook build doc/'
             }
