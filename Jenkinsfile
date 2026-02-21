@@ -36,6 +36,8 @@ pipeline {
             steps {
                 // TODO add cache
                 sh 'cargo +stable install mdbook mdbook-mermaid'
+                // load cargo env to get bins in PATH
+                sh '. "$HOME/.cargo/env"'
                 sh 'mdbook-mermaid install doc/'
                 sh 'mdbook build doc/'
             }
