@@ -17,12 +17,14 @@ pipeline {
                     }
                 }
                 stages {
-                    stage("${DIR}") {
+                    stage('Clippy') {
                         steps {
-                            dir("${DIR}") {
-                                sh 'cargo clippy --all-features --all-targets -- -D warnings'
-                                sh 'cargo fmt --check'
-                            }
+                            sh 'cd $DIR && cargo clippy --all-features --all-targets -- -D warnings'
+                        }
+                    }
+                    stage('Format') {
+                        steps {
+                            sh 'cd $DIR && cargo fmt --check'
                         }
                     }
                 }
