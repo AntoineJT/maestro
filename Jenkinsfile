@@ -17,7 +17,7 @@ pipeline {
                     }
                 }
                 stages {
-                    stage("${DIR.capitalize()}") {
+                    stage("${DIR}") {
                         steps {
                             dir("${DIR}") {
                                 sh 'cargo clippy --all-features --all-targets -- -D warnings'
