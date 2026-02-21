@@ -36,9 +36,8 @@ pipeline {
             steps {
                 // TODO add cache
                 sh 'cargo +stable install mdbook mdbook-mermaid'
-                sh 'export PATH=$HOME/.cargo/bin:$PATH'
-                sh 'mdbook-mermaid install doc/'
-                sh 'mdbook build doc/'
+                sh 'PATH=$HOME/.cargo/bin:$PATH mdbook-mermaid install doc/'
+                sh 'PATH=$HOME/.cargo/bin:$PATH mdbook build doc/'
             }
         }
         stage('Documentation') {
