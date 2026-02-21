@@ -1,12 +1,14 @@
 pipeline {
     agent { label 'maestro' }
     stages {
+        // TODO add cache
         stage('Install rust toolchain') {
             steps {
                 // install from rust-toolchain.toml
                 sh 'rustup show'
             }
         }
+        // TODO use matrixes
         stage('Clippy') {
             parallel {
                 stage('Macros') {
@@ -26,7 +28,7 @@ pipeline {
                 stage('Kernel') {
                     steps {
                         dir('kernel') {
-                            sh 'cp default.build-config.toml build-config.toml'
+                            sh 'cp default.build-config.toml build-config.toml' // TODO rm
                             sh 'cargo clippy --all-features --all-targets -- -D warnings'
                         }
                     }
@@ -40,6 +42,7 @@ pipeline {
                 }
             }
         }
+        // TODO use matrixes
         stage('Format') {
             parallel {
                 stage('Macros') {
@@ -74,6 +77,8 @@ pipeline {
         }
         stage('Book') {
             steps {
+                // TODO add cache
+                sh 'cargo install mdbook mdbook-mermaid'
                 sh 'mdbook-mermaid install doc/'
                 sh 'mdbook build doc/'
             }
