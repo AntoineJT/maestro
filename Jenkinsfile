@@ -3,10 +3,11 @@ pipeline {
     stages {
         stage('Install rust toolchains') {
             steps {
-                cache(path: '~/.rustup/toolchains',
+                cache(caches: [ arbitraryFileCache(
+                    path: '~/.rustup/toolchains',
                     cacheName: 'rust-toolchains',
                     cacheValidityDecidingFile: 'rust-toolchain.toml')
-                {
+                ]) {
                     // used for builds with 'cargo install'
                     sh 'rustup toolchain install stable'
                     // install from rust-toolchain.toml
@@ -38,7 +39,10 @@ pipeline {
         }
         stage('Book') {
             steps {
-                cache(path: '~/.cargo/bin', cacheName: 'cargo-bin') {
+                cache(caches: [ arbitraryFileCache(
+                    path: '~/.cargo/bin',
+                    cacheName: 'cargo-bin')
+                ]) {
                     sh 'cargo +stable install mdbook'
                 }
                 sh 'PATH=$HOME/.cargo/bin:$PATH mdbook-mermaid install doc/'
