@@ -15,30 +15,30 @@ pipeline {
                 }
             }
         }
-        stage('Lint & Doc') {
-            parallel {
-                stage('Lint') {
-                    matrix {
-                        axes {
-                            axis {
-                                name 'DIR'
-                                values 'macros', 'utils', 'kernel', 'inttest'
-                            }
+        stage('Lint') {
+            matrix {
+                axes {
+                    axis {
+                        name 'DIR'
+                        values 'macros', 'utils', 'kernel', 'inttest'
+                    }
+                }
+                stages {
+                    stage('Clippy') {
+                        steps {
+                            sh 'cd $DIR && cargo clippy --all-features --all-targets -- -D warnings'
                         }
-                        stages {
-                            stage('Clippy') {
-                                steps {
-                                    sh 'cd $DIR && cargo clippy --all-features --all-targets -- -D warnings'
-                                }
-                            }
-                            stage('Format') {
-                                steps {
-                                    sh 'cd $DIR && cargo fmt --check'
-                                }
-                            }
+                    }
+                    stage('Format') {
+                        steps {
+                            sh 'cd $DIR && cargo fmt --check'
                         }
                     }
                 }
+            }
+        }
+        stage('Build documentation') {
+            parallel {
                 stage('Book') {
                     steps {
                         cache(caches: [ arbitraryFileCache(
@@ -51,22 +51,11 @@ pipeline {
                         sh 'PATH=$HOME/.cargo/bin:$PATH mdbook build doc/'
                     }
                 }
-                stage('Documentation') {
-                    matrix {
-                        axes {
-                            axis {
-                                name 'ARCH'
-                                values 'x86', 'x86_64'
-                            }
-                        }
-                        stages {
-                            stage('Build references') {
-                                steps {
-                                    dir('kernel') {
-                                        sh 'cargo doc --target arch/${ARCH}/${ARCH}.json'
-                                    }
-                                }
-                            }
+                stage('Cargo doc') {
+                    steps {
+                        dir('kernel') {
+                            sh 'cargo doc --target arch/x86/x86.json'
+                            sh 'cargo doc --target arch/x86_64/x86_64.json'
                         }
                     }
                 }
