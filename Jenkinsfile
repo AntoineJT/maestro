@@ -43,7 +43,7 @@ pipeline {
                     path: '~/.cargo/bin',
                     cacheName: 'cargo-bin')
                 ]) {
-                    sh 'cargo +stable install mdbook'
+                    sh 'cargo +stable install mdbook mdbook-mermaid'
                 }
                 sh 'PATH=$HOME/.cargo/bin:$PATH mdbook-mermaid install doc/'
                 sh 'PATH=$HOME/.cargo/bin:$PATH mdbook build doc/'
