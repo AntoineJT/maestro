@@ -1,13 +1,17 @@
 pipeline {
     agent { label 'maestro' }
     stages {
-        // TODO add cache
         stage('Install rust toolchains') {
             steps {
-                // used for builds with 'cargo install'
-                sh 'rustup toolchain install stable'
-                // install from rust-toolchain.toml
-                sh 'rustup show'
+                cache(path: '~/.rustup/toolchains',
+                    cacheName: 'rust-toolchains',
+                    cacheValidityDecidingFile: 'rust-toolchain.toml')
+                {
+                    // used for builds with 'cargo install'
+                    sh 'rustup toolchain install stable'
+                    // install from rust-toolchain.toml
+                    sh 'rustup show'
+                }
             }
         }
         stage('Lint') {
@@ -34,8 +38,9 @@ pipeline {
         }
         stage('Book') {
             steps {
-                // TODO add cache
-                sh 'cargo +stable install mdbook mdbook-mermaid'
+                cache(path: '~/.cargo/bin', cacheName: 'cargo-bin') {
+                    sh 'cargo +stable install mdbook'
+                }
                 sh 'PATH=$HOME/.cargo/bin:$PATH mdbook-mermaid install doc/'
                 sh 'PATH=$HOME/.cargo/bin:$PATH mdbook build doc/'
             }
