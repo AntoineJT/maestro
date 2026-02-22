@@ -15,53 +15,55 @@ pipeline {
                 }
             }
         }
-        stage('Lint') {
-            matrix {
-                axes {
-                    axis {
-                        name 'DIR'
-                        values 'macros', 'utils', 'kernel', 'inttest'
-                    }
-                }
-                stages {
-                    stage('Clippy') {
-                        steps {
-                            sh 'cd $DIR && cargo clippy --all-features --all-targets -- -D warnings'
+        parallel {
+            stage('Lint') {
+                matrix {
+                    axes {
+                        axis {
+                            name 'DIR'
+                            values 'macros', 'utils', 'kernel', 'inttest'
                         }
                     }
-                    stage('Format') {
-                        steps {
-                            sh 'cd $DIR && cargo fmt --check'
+                    stages {
+                        stage('Clippy') {
+                            steps {
+                                sh 'cd $DIR && cargo clippy --all-features --all-targets -- -D warnings'
+                            }
+                        }
+                        stage('Format') {
+                            steps {
+                                sh 'cd $DIR && cargo fmt --check'
+                            }
                         }
                     }
                 }
             }
-        }
-        stage('Book') {
-            steps {
-                cache(caches: [ arbitraryFileCache(
-                    path: '~/.cargo/bin',
-                    cacheName: 'cargo-bin')
-                ]) {
-                    sh 'cargo +stable install mdbook mdbook-mermaid'
-                }
-                sh 'PATH=$HOME/.cargo/bin:$PATH mdbook-mermaid install doc/'
-                sh 'PATH=$HOME/.cargo/bin:$PATH mdbook build doc/'
-            }
-        }
-        stage('Documentation') {
-            matrix {
-                axes {
-                    axis {
-                        name 'ARCH'
-                        values 'x86', 'x86_64'
+            stage('Book') {
+                steps {
+                    cache(caches: [ arbitraryFileCache(
+                        path: '~/.cargo/bin',
+                        cacheName: 'cargo-bin')
+                    ]) {
+                        sh 'cargo +stable install mdbook mdbook-mermaid'
                     }
+                    sh 'PATH=$HOME/.cargo/bin:$PATH mdbook-mermaid install doc/'
+                    sh 'PATH=$HOME/.cargo/bin:$PATH mdbook build doc/'
                 }
-                stages {
-                    stage('Build references') {
-                        steps {
-                            dir('kernel') {
-                                sh 'cargo doc --target arch/${ARCH}/${ARCH}.json'
+            }
+            stage('Documentation') {
+                matrix {
+                    axes {
+                        axis {
+                            name 'ARCH'
+                            values 'x86', 'x86_64'
+                        }
+                    }
+                    stages {
+                        stage('Build references') {
+                            steps {
+                                dir('kernel') {
+                                    sh 'cargo doc --target arch/${ARCH}/${ARCH}.json'
+                                }
                             }
                         }
                     }
