@@ -85,16 +85,10 @@ pipeline {
                     }
                 }
                 stages {
-                    stage('Build') {
+                    stage('Build & Check Multiboot2') {
                         steps {
                             dir('kernel') {
                                 sh 'cargo build --target arch/${ARCH}/${ARCH}.json --profile ${PROFILE}'
-                            }
-                        }
-                    }
-                    stage('Check Multiboot2') {
-                        steps {
-                            dir('kernel') {
                                 sh 'grub-file --is-x86-multiboot2 target/${ARCH}/${PROFILE_DIR}/maestro'
                             }
                         }
