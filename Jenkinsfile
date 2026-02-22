@@ -84,11 +84,23 @@ pipeline {
                         values 'debug', 'release'
                     }
                 }
+                when {
+                    expression {
+                        !(PROFILE == 'dev' && PROFILE_DIR == 'release') &&
+                        !(PROFILE == 'release' && PROFILE_DIR == 'debug')
+                    }
+                }
                 stages {
-                    stage('Build & Check Multiboot2') {
+                    stage('Build') {
                         steps {
                             dir('kernel') {
                                 sh 'cargo build --target arch/${ARCH}/${ARCH}.json --profile ${PROFILE}'
+                            }
+                        }
+                    }
+                    stage('Check Multiboot2') {
+                        steps {
+                            dir('kernel') {
                                 sh 'grub-file --is-x86-multiboot2 target/${ARCH}/${PROFILE_DIR}/maestro'
                             }
                         }
